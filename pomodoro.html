@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Test</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+</head>
+
+
+<body>
+
+
+
+<div id="app">
+    <h1>Pomodoro Timer</h1>
+    <div>{{ secondsLeft | format }}</div>
+    <button @click="setTimer">start</button>
+    <button @click="pause">{{ pauseOrResume }}</button>
+    <button @click="stop">stop</button>
+    <button @click="next">next</button>
+    <li v-for="pom in pomodoro">{{ pom }}</li>
+    <div>{{ state ?  "break" : "work"}} </div>
+</div>
+
+
+</body>
+
+
+
+<script>
+vm = new Vue({
+    el: "#app",
+    data: {
+        workSeconds: 2, //1500,
+        shortSeconds: 3,
+        longSeconds: 5,
+        fullCycle: 4,
+
+        secondsLeft: null,
+        timer: null,
+        pomodoro: [],
+        pauseOrResume: "pause",
+        state: 0, // 0: work, 1: pause
+    },
+    created: function() {
+        this.secondsLeft = this.workSeconds;
+    },
+    methods: {
+        
+        pause() {
+            clearTimeout(this.timer);
+            var isPaused = this.pauseOrResume == "pause"
+            this.pauseOrResume = isPaused ? "resume" : "pause"
+            if (!isPaused) {
+                this.setTimer();
+            }
+        },
+
+        next() {
+            clearTimeout(this.timer);
+            if (this.state == 0) {
+                this.pomodoro.push("🍅");
+                if (this.pomodoro.length == this.fullCycle) {
+                    this.pomodoro = [];
+                    this.longPause();
+                } else {
+                    this.shortPause();
+                }
+
+            } else {
+                this.work()
+            }
+            this.state = (this.state + 1) % 2
+        },
+
+        longPause() {
+            // finito il pomodoro-cycle
+            this.secondsLeft = this.longSeconds
+            this.setTimer();
+        },
+
+        shortPause() {
+            this.secondsLeft = this.shortSeconds
+            this.setTimer();
+        },
+
+        work() {
+            this.secondsLeft = this.workSeconds;
+            this.setTimer();
+        },
+
+        stop() {
+            clearTimeout(this.timer);
+            this.secondsLeft = this.workSeconds;
+            this.pomodoro = [];
+            this.state = 0;
+            this.pauseOrResume = "pause";
+        },
+
+        setTimer() {
+            this.timer = setInterval(() => {
+                this.secondsLeft--;
+                if (this.secondsLeft === 0) {
+                    clearTimeout(this.timer);
+                    this.next();
+                }
+            }, 1000);
+        }
+    },
+
+    filters: {
+        format: function secondsToFormat(seconds) {
+                    var minutes = ('0' + Math.floor(seconds / 60)).slice(-2);
+                    var seconds = ('0' + (seconds - minutes * 60)).slice(-2);
+                    return minutes + ":" + seconds;
+                },
+    }
+});
+</script>
