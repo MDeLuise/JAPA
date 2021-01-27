@@ -5,7 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Test</title>
 
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+    <link rel="stylesheet" type="text/css" href="pomodoro.css">
 </head>
 
 
@@ -14,14 +16,17 @@
 
 
 <div id="app">
-    <h1>Pomodoro Timer</h1>
-    <div>{{ secondsLeft | format }}</div>
-    <button @click="setTimer">start</button>
-    <button @click="pause">{{ pauseOrResume }}</button>
-    <button @click="stop">stop</button>
-    <button @click="next">next</button>
-    <li v-for="pom in pomodoro">{{ pom }}</li>
-    <div>{{ state ?  "break" : "work"}} </div>
+    <div id="header">
+        <p>{{ pomodoro | displayPom }}</p>
+    </div>
+    <div id="main">
+        <p id="time">{{ secondsLeft | format }}</p>
+    </div>
+    <div id="bottom">
+        <button @click="stop" id='stop'></button> <!-- &#9726 -->
+        <button @click="playPause" id="pp"></button>
+        <button @click="next">\>\></button>
+    </div>
 </div>
 
 
@@ -33,26 +38,30 @@
 vm = new Vue({
     el: "#app",
     data: {
-        workSeconds: 2, //1500,
-        shortSeconds: 3,
-        longSeconds: 5,
+        workSeconds: 10, //1500,
+        shortSeconds: 5,
+        longSeconds: 15,
         fullCycle: 4,
+        bkWork: "#ff6b6b",
+        bkShort: "#f4a261",
+        bkLong: "#2ec4b6",
 
         secondsLeft: null,
         timer: null,
-        pomodoro: [],
-        pauseOrResume: "pause",
-        state: 0, // 0: work, 1: pause
+        pomodoro: 0,
+        isPlayOrPause: "play",
+        state: 0, // 0: work, 1: short, 2: work, 3: short, 4: work, 5: short, 6: work, 7: long
     },
     created: function() {
         this.secondsLeft = this.workSeconds;
+        document.querySelector("body").style.backgroundColor = this.bkWork
     },
     methods: {
         
-        pause() {
+        playPause() {
             clearTimeout(this.timer);
-            var isPaused = this.pauseOrResume == "pause"
-            this.pauseOrResume = isPaused ? "resume" : "pause"
+            var isPaused = this.isPlayOrPause == "pause"
+            this.isPlayOrPause = isPaused ? "play" : "pause"
             if (!isPaused) {
                 this.setTimer();
             }
@@ -60,33 +69,39 @@ vm = new Vue({
 
         next() {
             clearTimeout(this.timer);
-            if (this.state == 0) {
-                this.pomodoro.push("🍅");
-                if (this.pomodoro.length == this.fullCycle) {
-                    this.pomodoro = [];
-                    this.longPause();
-                } else {
-                    this.shortPause();
-                }
+            if ([0, 2, 4].indexOf(this.state) >= 0) {
+                this.pomodoro++;
+                this.shortPause();
 
+            } else if ([1, 3, 5].indexOf(this.state) >= 0) {
+                this.work();
+            
+            } else if (this.state == 6) {
+                this.pomodoro++;
+                this.longPause();
+            
             } else {
+                this.pomodoro = 0;
                 this.work()
             }
-            this.state = (this.state + 1) % 2
+            this.state = (this.state + 1) % 8
         },
 
         longPause() {
             // finito il pomodoro-cycle
+            document.querySelector("body").style.backgroundColor = this.bkLong
             this.secondsLeft = this.longSeconds
-            this.setTimer();
+            this.setTimer(true);
         },
 
         shortPause() {
+            document.querySelector("body").style.backgroundColor = this.bkShort
             this.secondsLeft = this.shortSeconds
             this.setTimer();
         },
 
         work() {
+            document.querySelector("body").style.backgroundColor = this.bkWork
             this.secondsLeft = this.workSeconds;
             this.setTimer();
         },
@@ -99,7 +114,7 @@ vm = new Vue({
             this.pauseOrResume = "pause";
         },
 
-        setTimer() {
+        setTimer(reset) {
             this.timer = setInterval(() => {
                 this.secondsLeft--;
                 if (this.secondsLeft === 0) {
@@ -116,6 +131,29 @@ vm = new Vue({
                     var seconds = ('0' + (seconds - minutes * 60)).slice(-2);
                     return minutes + ":" + seconds;
                 },
+
+        displayPom: function secondsToFormat(pom) {
+                        toDisplay = ""
+                        toAdd = "🍅 "
+                        i = 0
+                        for (i; i < pom; i++) {
+                            toDisplay += toAdd
+                        }
+                        for (i; i< 4; i++) {
+                            toDisplay += "X ";
+                        }
+                        return toDisplay;
+                    },
     }
+});
+</script>
+
+<script>
+$(document).ready(function() {
+  var btn = $("#pp");
+  btn.click(function() {
+    btn.toggleClass("paused");
+    return false;
+  });
 });
 </script>
