@@ -10,6 +10,11 @@ html, body {
 }
 
 
+
+
+
+
+
 #app {
     display: flex;
     flex-direction: column;
@@ -18,7 +23,7 @@ html, body {
 }
 
 #header {
-    background-color: cornflowerblue;
+    /*background-color: cornflowerblue;*/
     flex-grow: 1;
 
     display: flex;
@@ -32,7 +37,7 @@ html, body {
     letter-spacing: .5rem;
     opacity: .7;
     max-height: 600px;
-    background-color: brown;
+    /*background-color: brown;*/
     
     display: flex;
     justify-content: center;
@@ -40,7 +45,7 @@ html, body {
 }
 
 #bottom {
-    background-color: blueviolet;
+    /*background-color: blueviolet;*/
     flex-grow: 1;
 
     display: flex;
@@ -50,12 +55,69 @@ html, body {
 
 
 
-
 @media only screen and (max-width: 500px) {
     #time {
         font-size: 22vw;
     }
 }
+
+
+#phases-container {
+    border-radius: .5rem;
+    border: 10pt solid #1f2937;
+}
+
+#carousel {
+    background-color: #1f2937;
+}
+
+#name {
+    background-color: #374151;
+    color: white;
+    border: 10pt solid #374151;
+}
+
+.work {
+    background: #79434b;
+    border: 1pt solid #79434b;
+}
+
+.short {
+    background: #f4a261;
+    border: 1pt solid #f4a261;
+}
+
+.long {
+    background: #2ec4b6;
+    border: 1pt solid #2ec4b6;
+}
+
+.phase {
+    position: relative;
+    display: inline-block;
+    border-radius: .5rem;
+    width: 48px;
+    height: 48px;
+    opacity: .4;
+    margin-right: 5px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.selected {
+    border: 1pt solid white;
+    opacity: 1;
+}
+
+.offscreen {
+    display: none;
+}
+
+
+
+
+
+
 
 
 #pp {

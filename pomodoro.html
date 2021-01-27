@@ -17,7 +17,20 @@
 
 <div id="app">
     <div id="header">
-        <p>{{ pomodoro | displayPom }}</p>
+        <div id="phases-container">
+            <div id="carousel">
+                <div class="phase work selected"></div>
+                <div class="phase short"></div>
+                <div class="phase work"></div>
+                <div class="phase short"></div>
+                <div class="phase work"></div>
+                <div class="phase short offscreen"></div>
+                <!--<div class="phase work"></div>
+                <div class="phase long"></div>-->
+            </div>
+            <div id="name">work</div>
+        </div>
+        <!--<p>{{ pomodoro | displayPom }}</p>-->
     </div>
     <div id="main">
         <p id="time">{{ secondsLeft | format }}</p>
