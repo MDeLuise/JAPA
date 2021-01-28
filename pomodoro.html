@@ -6,7 +6,8 @@
     <title>Test</title>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+    <script type="text/javascript" src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>    
+    <script src="https://unpkg.com/vue@next"></script>
     <link rel="stylesheet" type="text/css" href="pomodoro.css">
 </head>
 
@@ -19,21 +20,30 @@
     <div id="header">
         <div id="phases-container">
             <div id="carousel">
-                <div class="phase work selected"></div>
+                
+                <div class="phase work selected foo"></div>
                 <div class="phase short"></div>
                 <div class="phase work"></div>
                 <div class="phase short"></div>
                 <div class="phase work"></div>
                 <div class="phase short offscreen"></div>
-                <!--<div class="phase work"></div>
-                <div class="phase long"></div>-->
+                <div class="phase work offscreen"></div>
+                <div class="phase long offscreen"></div>
+                <!--
+                <phase-div></phase-div>
+                <phase-div></phase-div>
+                <phase-div></phase-div>
+                <phase-div></phase-div>
+                <phase-div></phase-div>
+                <phase-div></phase-div>
+                <phase-div></phase-div>
+                <phase-div></phase-div>-->
             </div>
             <div id="name">work</div>
         </div>
-        <!--<p>{{ pomodoro | displayPom }}</p>-->
     </div>
     <div id="main">
-        <p id="time">{{ secondsLeft | format }}</p>
+        <p id="time">{{ timeLeft }}</p>
     </div>
     <div id="bottom">
         <button @click="stop" id='stop'></button> <!-- &#9726 -->
@@ -48,27 +58,38 @@
 
 
 <script>
-vm = new Vue({
-    el: "#app",
-    data: {
-        workSeconds: 10, //1500,
-        shortSeconds: 5,
-        longSeconds: 15,
-        fullCycle: 4,
-        bkWork: "#ff6b6b",
-        bkShort: "#f4a261",
-        bkLong: "#2ec4b6",
+const app = {
+    data() {
+        return {
+            workSeconds: 10, //1500,
+            shortSeconds: 5,
+            longSeconds: 15,
+            fullCycle: 4,
+            bkWork: "#ff6b6b",
+            bkShort: "#f4a261",
+            bkLong: "#2ec4b6",
 
-        secondsLeft: null,
-        timer: null,
-        pomodoro: 0,
-        isPlayOrPause: "play",
-        state: 0, // 0: work, 1: short, 2: work, 3: short, 4: work, 5: short, 6: work, 7: long
+            secondsLeft: null,
+            timer: null,
+            pomodoro: 0,
+            isPlayOrPause: "play",
+            state: 0, // 0: work, 1: short, 2: work, 3: short, 4: work, 5: short, 6: work, 7: long
+        }
     },
-    created: function() {
+
+    computed: {
+        timeLeft() {
+                    var minutes = ('0' + Math.floor(this.secondsLeft / 60)).slice(-2);
+                    var seconds = ('0' + (this.secondsLeft - minutes * 60)).slice(-2);
+                    return minutes + ":" + seconds;
+                }
+    },
+
+    created() {
         this.secondsLeft = this.workSeconds;
         document.querySelector("body").style.backgroundColor = this.bkWork
     },
+
     methods: {
         
         playPause() {
@@ -98,6 +119,32 @@ vm = new Vue({
                 this.work()
             }
             this.state = (this.state + 1) % 8
+            this.stepSlideshow()
+        },
+
+        stepSlideshow() {
+            $(".phase").first().animate({
+                right: "+=59px",
+            }, {
+                duration: 500,
+                queue: false,
+                step: function( currentLeft ) {					
+                    if (currentLeft > 1) {
+                        $(".phase").slice(1).css("right", currentLeft)
+                    };
+                },
+                start: function() {
+                    $(".phase").eq(1).addClass("selected")
+                    $(".phase.phase:nth-child(6)").fadeIn(500,"easeInCirc", function() { $(".phase:nth-child(6)").removeClass("offscreen")})
+                    $(".phase").first().fadeOut(780,"easeOutExpo", function() {
+                        $(".phase").first().addClass("offscreen")
+                        $(".phase").first().removeClass("selected")
+                        $("#carousel").append($(".phase").first())
+                        $(".phase").removeAttr("style");
+                        }
+                    )
+                },
+            });
         },
 
         longPause() {
@@ -137,28 +184,10 @@ vm = new Vue({
             }, 1000);
         }
     },
+};
 
-    filters: {
-        format: function secondsToFormat(seconds) {
-                    var minutes = ('0' + Math.floor(seconds / 60)).slice(-2);
-                    var seconds = ('0' + (seconds - minutes * 60)).slice(-2);
-                    return minutes + ":" + seconds;
-                },
+Vue.createApp(app).mount("#app")
 
-        displayPom: function secondsToFormat(pom) {
-                        toDisplay = ""
-                        toAdd = "🍅 "
-                        i = 0
-                        for (i; i < pom; i++) {
-                            toDisplay += toAdd
-                        }
-                        for (i; i< 4; i++) {
-                            toDisplay += "X ";
-                        }
-                        return toDisplay;
-                    },
-    }
-});
 </script>
 
 <script>
