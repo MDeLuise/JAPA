@@ -1,9 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=Source+Sans+Pro&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Source+Sans+Pro&family=Poppins:wght@400&display=swap');
 
 body {
     font-family: 'Source Sans Pro', sans-serif;
     text-align: center;
 }
+
 html, body {
     width: 100%;
     height: 100%;
@@ -77,6 +78,9 @@ html, body {
     color: white;
     border: 10pt solid #374151;
     border-radius: 0 0 .5rem .5rem;
+
+    font-size: 16px;
+    font-family: 'Poppins', sans-serif;
 }
 
 .work {
@@ -126,35 +130,31 @@ html, body {
 
 
 
-#pp {
+
+
+svg {
+    fill: #1f2937;
+    margin: 3px;
+
+    background-color: #e5e7eb;
     border: 0;
-    background: transparent;
-    box-sizing: border-box;
-    width: 0;
-    height: 74px;
-    border-color: transparent transparent transparent #202020;
-    transition: 100ms all ease;
+    outline: 0;
+    padding: 1.5rem 2rem;
+    box-shadow: 0px 5px 10px #374151;
+    transition: all 0.3s;
     cursor: pointer;
-    border-style: solid;
-    border-width: 37px 0 37px 60px;
+    border-radius: 5px;
+    border-bottom: 4px solid #d9d9d9;
 }
 
-#pp.paused {
-    border-style: double;
-    border-width: 0px 0 0px 60px;
-}
+svg:hover {
+    fill: #374151;
 
-#pp:hover {
-    border-color: transparent transparent transparent #404040;
+    box-shadow: 0px 15px 25px -5px #374151;
+    transform: scale(1.03);
 }
-
-#stop {
-    width: 50px;
-    height: 50px;
-    background-color: #202020;
-    border: none;
-}
-
-#stop:hover {
-    background-color: #404040;
+  
+svg:active {
+    box-shadow: 0px 4px 8px #374151;
+    transform: scale(0.98);
 }

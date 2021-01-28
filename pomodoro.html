@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -20,7 +20,6 @@
     <div id="header">
         <div id="phases-container">
             <div id="carousel">
-                
                 <div class="phase work selected foo"></div>
                 <div class="phase short"></div>
                 <div class="phase work"></div>
@@ -29,26 +28,18 @@
                 <div class="phase short offscreen"></div>
                 <div class="phase work offscreen"></div>
                 <div class="phase long offscreen"></div>
-                <!--
-                <phase-div></phase-div>
-                <phase-div></phase-div>
-                <phase-div></phase-div>
-                <phase-div></phase-div>
-                <phase-div></phase-div>
-                <phase-div></phase-div>
-                <phase-div></phase-div>
-                <phase-div></phase-div>-->
             </div>
-            <div id="name">work</div>
+            <div id="name">{{ phaseName }}</div>
         </div>
     </div>
     <div id="main">
         <p id="time">{{ timeLeft }}</p>
     </div>
     <div id="bottom">
-        <button @click="stop" id='stop'></button> <!-- &#9726 -->
-        <button @click="playPause" id="pp"></button>
-        <button @click="next">\>\></button>
+        <svg @click="stop" width="10px" height="10px" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" rx="68.27" ry="68.27"/></svg>
+        <svg v-if="paused" @click="playPause" width="30px" height="30px" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M60.54,512c-17.06,0-30.43-13.86-30.43-31.56V31.55C30.12,13.86,43.48,0,60.55,0A32.94,32.94,0,0,1,77,4.52L465.7,229c10.13,5.85,16.18,16,16.18,27s-6,21.2-16.18,27L77,507.48A32.92,32.92,0,0,1,60.55,512Z"/></svg>
+        <svg v-else @click="playPause" width="30px" height="30px" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M395,512a73.14,73.14,0,0,1-73.14-73.14V73.14a73.14,73.14,0,1,1,146.29,0V438.86A73.14,73.14,0,0,1,395,512Z" fill="#434040"/><path d="M117,512a73.14,73.14,0,0,1-73.14-73.14V73.14a73.14,73.14,0,1,1,146.29,0V438.86A73.14,73.14,0,0,1,117,512Z"/></svg>
+        <svg @click="next" width="10px" height="10px" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M30.24,510.43c-17,0-30.24-13.78-30.24-31.36V32.93C0,15.35,13.28,1.57,30.25,1.57a32.73,32.73,0,0,1,16.3,4.49L383.39,229.12c10.07,5.81,16.08,15.86,16.08,26.88s-6,21.07-16.08,26.87L46.55,505.94a32.72,32.72,0,0,1-16.3,4.49Z"/><path d="M450.06,499.51a61.94,61.94,0,0,1-61.94-61.93V74.42a61.94,61.94,0,0,1,123.88,0V437.58A61.94,61.94,0,0,1,450.06,499.51Z"/></svg>
     </div>
 </div>
 
@@ -71,18 +62,28 @@ const app = {
 
             secondsLeft: null,
             timer: null,
-            pomodoro: 0,
-            isPlayOrPause: "play",
+            paused: true,
+            zero: false,
             state: 0, // 0: work, 1: short, 2: work, 3: short, 4: work, 5: short, 6: work, 7: long
         }
     },
 
     computed: {
         timeLeft() {
-                    var minutes = ('0' + Math.floor(this.secondsLeft / 60)).slice(-2);
-                    var seconds = ('0' + (this.secondsLeft - minutes * 60)).slice(-2);
-                    return minutes + ":" + seconds;
-                }
+            var minutes = ('0' + Math.floor(this.secondsLeft / 60)).slice(-2);
+            var seconds = ('0' + (this.secondsLeft - minutes * 60)).slice(-2);
+            return minutes + ":" + seconds;
+                },
+
+        phaseName() {
+            if (this.state % 2 == 0) {
+                return "work"
+            } else if (this.state == 7) {
+                return "long break"
+            } else {
+                return "break"
+            }
+        }
     },
 
     created() {
@@ -94,29 +95,30 @@ const app = {
         
         playPause() {
             clearTimeout(this.timer);
-            var isPaused = this.isPlayOrPause == "pause"
-            this.isPlayOrPause = isPaused ? "play" : "pause"
-            if (!isPaused) {
+            if (this.paused) {
                 this.setTimer();
             }
+            this.paused = ! this.paused
         },
 
         next() {
+            if($(".phase").first().is(':animated')) {
+                return
+            }
             clearTimeout(this.timer);
+            this.paused = ! this.zero
+            start = this.zero
             if ([0, 2, 4].indexOf(this.state) >= 0) {
-                this.pomodoro++;
-                this.shortPause();
+                this.shortPause(start);
 
             } else if ([1, 3, 5].indexOf(this.state) >= 0) {
-                this.work();
+                this.work(start);
             
             } else if (this.state == 6) {
-                this.pomodoro++;
-                this.longPause();
+                this.longPause(start);
             
             } else {
-                this.pomodoro = 0;
-                this.work()
+                this.work(start)
             }
             this.state = (this.state + 1) % 8
             this.stepSlideshow()
@@ -135,7 +137,9 @@ const app = {
                 },
                 start: function() {
                     $(".phase").eq(1).addClass("selected")
-                    $(".phase.phase:nth-child(6)").fadeIn(500,"easeInCirc", function() { $(".phase:nth-child(6)").removeClass("offscreen")})
+                    $(".phase.phase:nth-child(6)").fadeIn(500,"easeInCirc", function() {
+                        $(".phase:nth-child(6)").removeClass("offscreen")
+                    })
                     $(".phase").first().fadeOut(780,"easeOutExpo", function() {
                         $(".phase").first().addClass("offscreen")
                         $(".phase").first().removeClass("selected")
@@ -147,38 +151,45 @@ const app = {
             });
         },
 
-        longPause() {
+        longPause(start) {
             // finito il pomodoro-cycle
             document.querySelector("body").style.backgroundColor = this.bkLong
             this.secondsLeft = this.longSeconds
-            this.setTimer(true);
+            if (start) {
+                this.setTimer(true);
+            }
         },
 
-        shortPause() {
+        shortPause(start) {
             document.querySelector("body").style.backgroundColor = this.bkShort
             this.secondsLeft = this.shortSeconds
-            this.setTimer();
+            if (start) {
+                 this.setTimer();
+            }
         },
 
-        work() {
+        work(start) {
             document.querySelector("body").style.backgroundColor = this.bkWork
             this.secondsLeft = this.workSeconds;
-            this.setTimer();
+            if (start) {
+                 this.setTimer();
+            }
         },
 
-        stop() {
+        stop(start) {
             clearTimeout(this.timer);
             this.secondsLeft = this.workSeconds;
-            this.pomodoro = [];
             this.state = 0;
             this.pauseOrResume = "pause";
         },
 
-        setTimer(reset) {
+        setTimer() {
             this.timer = setInterval(() => {
                 this.secondsLeft--;
+                this.zero = false;
                 if (this.secondsLeft === 0) {
                     clearTimeout(this.timer);
+                    this.zero = true;
                     this.next();
                 }
             }, 1000);
@@ -188,14 +199,4 @@ const app = {
 
 Vue.createApp(app).mount("#app")
 
-</script>
-
-<script>
-$(document).ready(function() {
-  var btn = $("#pp");
-  btn.click(function() {
-    btn.toggleClass("paused");
-    return false;
-  });
-});
 </script>
