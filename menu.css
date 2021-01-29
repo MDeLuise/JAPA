@@ -1,0 +1,30 @@
+#sliding-menu {
+    height: 100%;
+    width: 0;
+    max-width: 568px;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    right: 0;
+    background-color: white;
+    overflow-x: hidden;
+    transition: .25s all ease-in-out;
+    font-family: 'Poppins', sans-serif;
+}
+
+#menu-content {
+    padding-right: 9px;
+    padding-left: 9px;
+}
+
+#menu-header {
+    display: flex;
+    align-items: center;
+    text-transform: uppercase;
+}
+
+#menu-header > h2 {
+    margin-right: auto;
+    margin-top: 16px;
+    font-weight: bold;
+}
