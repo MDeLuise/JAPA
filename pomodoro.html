@@ -6,10 +6,11 @@
     <title>Test</title>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script type="text/javascript" src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>    
+    <script type="text/javascript" src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
     <script src="https://unpkg.com/vue@next"></script>
     <link rel="stylesheet" type="text/css" href="pomodoro.css">
     <link rel="stylesheet" type="text/css" href="menu.css">
+    <script type="text/javascript" src="pomodoro.js"></script>
 </head>
 
 
@@ -17,12 +18,13 @@
 
 
 <div id="app">
-    <div id="header">
+    <div v-if="displaySchedule" id="header">
         <div class="settings-icon" @click="toggleSettings">
             <svg data-v-7a83a73c=""width="24" height="24" viewBox="0 0 24 24"><path data-v-7a83a73c="" d="M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.21,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.21,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.67 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z"></path></svg>
         </div>
         <div id="phases-container">
             <div id="carousel">
+            <!--
                 <div v-bind:class="initPhases[0]"></div>
                 <div v-bind:class="initPhases[1]"></div>
                 <div v-bind:class="initPhases[2]"></div>
@@ -31,12 +33,15 @@
                 <div v-bind:class="initPhases[5]"></div>
                 <div v-bind:class="initPhases[6]"></div>
                 <div v-bind:class="initPhases[7]"></div>
+            -->
             </div>
-            <div id="name">{{ phaseName }}</div>
+            <div v-if="displayPhaseName" id="name">{{ phaseName }}</div>
         </div>
     </div>
     <div id="main">
-        <p id="time">{{ timeLeft }}</p>
+        <p v-if="timerStyle == 'precise'" id="time">{{ timeLeftPrecise }}</p>
+        <p v-else-if="timerStyle == 'approximate'" id="time">{{ timeLeftApproximate }}</p>
+        <p v-else id="time">{{ timeLeftPercentage }}</p>
     </div>
     <div id="bottom">
         <svg @click="stop" width="10px" height="10px" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" rx="68.27" ry="68.27"/></svg>
@@ -58,8 +63,46 @@
                 <svg data-v-683a1026="" width="24" height="24" viewBox="0 0 24 24"><path data-v-683a1026="" d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"></path></svg>
             </div>
         </div>
-        <div id="mennu-body">
-            AAAA
+        <div class="menu-body" id="menu-sec-main">
+            <div class="sec">
+                <p class="title">AAA</p>
+                <div class="sec-body">
+                    aaa
+                </div>
+            </div>
+        </div>
+        <div class="menu-body" id="menu-sec-schedule">
+            <div class="sec">
+                <p class="title">Long Break interval</p>
+                <div class="sec-body">
+                    <input id="fake-long-interval"/>
+                    <!--
+                    <input v-model.lazy="fullCycle" id="real-long-interval" hidden />
+                    -->
+                    <p>{{fullCycle}}</p>
+                </div>
+            </div>
+        </div>
+        <div class="menu-body" id="menu-sec-display">
+            <div class="sec">
+                <p class="title">Timer Style</p>
+                <div class="sec-body">
+                    <button @click="changeTimerStyle('precise')">Traditional</button>
+                    <button @click="changeTimerStyle('approximate')">Approximate</button>
+                    <button @click="changeTimerStyle('percentage')">Percentage</button>
+                </div>
+                <div class="sec-body">
+                    <p>Show schedule</p>
+                    <input type="checkbox" v-model="displaySchedule"/>
+                    <p>Show section type in schedule</p>
+                    <input type="checkbox" v-model="displayPhaseName"/>
+                </div>
+            </div>
+        </div>
+        <div id="menu-footer">
+            <button onclick="display('main')">Main</button>
+            <button onclick="display('schedule')">Schedule</button>
+            <button onclick="display('display')">Display</button>
         </div>
     </div>
 </div>
@@ -74,10 +117,10 @@
 <script>
 function initialState () {
     return {
-        workSeconds: 1500,
-        shortSeconds: 300,
-        longSeconds: 900,
-        fullCycle: 4,
+        workSeconds: 1500, // 15 minutes
+        shortSeconds: 300, // 5 minutes
+        longSeconds: 900, // 10 minutes
+        fullCycle: 4, // 4 -> 3 shorts breaks then 1 long
         bkWork: "#ff6b6b",
         bkShort: "#f4a261",
         bkLong: "#2ec4b6",
@@ -89,7 +132,12 @@ function initialState () {
         zero: false,
         breakState: false,
         phaseName: "work",
-        shortPauses: 0
+        shortPauses: 0,
+        
+        timerStyle: "precise",
+        displaySchedule: true,
+        displayPhaseName: true,
+        phasesDisplayed: 5, // 5
     }
 }
 
@@ -100,24 +148,47 @@ const app = {
     },
 
     computed: {
-        timeLeft() {
+        timeLeftPrecise() {
             var minutes = ('0' + Math.floor(this.secondsLeft / 60)).slice(-2);
             var seconds = ('0' + (this.secondsLeft - minutes * 60)).slice(-2);
             return minutes + ":" + seconds;
         },
 
-        initPhases() {
-            var onScreen = 5
-            var tr = ["phase work selected"]
-            for (i = 1; i <= 8; i = i + 2) {
-                tr.push("phase short" + (i < onScreen ? "" : " offscreen"))
-                tr.push("phase work" + (i < onScreen ? "" : " offscreen"))
+        timeLeftApproximate() {
+            var minutes = Math.floor(this.secondsLeft / 60)
+            var seconds = this.secondsLeft - minutes * 60
+            if (minutes >= 1) {
+                return (seconds > 30 ? minutes + 1: minutes) + " minutes"
+            } else if (minutes > 0) {
+                return "a minute"
+            } else {
+                return "a few seconds"
             }
-            for (j = this.fullCycle * 2 - 1; j < 8; j = j * 2 - 1) {
-                tr[j] = "phase long" + (j < onScreen ? "" : " offscreen")
+        },
+
+        timeLeftPercentage() {
+            var secTot = this.workSeconds
+            if (this.phaseName == "break") {
+                secTot = this.shortSeconds
+            } else if (this.phaseName == "long break") {
+                secTot = this.longSeconds
+            }
+            return Math.floor(100 - this.secondsLeft * 100 / secTot) + " %"
+        },
+
+        initPhases() {
+            var tr = []
+            
+            while(tr.length < Math.max(this.fullCycle, this.phasesDisplayed)) {
+                tr.push("phase work" + (tr.length == 0 ? " selected" : "") + (tr.length < this.phasesDisplayed ? "" : " offscreen"))
+                for (var i = 0; i < Math.min(this.fullCycle, this.phasesDisplayed) - 1; i++) {
+                    tr.push("phase short" + (tr.length < this.phasesDisplayed ? "" : " offscreen"))
+                    tr.push("phase work" + (tr.length < this.phasesDisplayed ? "" : " offscreen"))
+                }
+                tr.push("phase long" + (tr.length < this.phasesDisplayed ? "" : " offscreen"))
             }
             return tr
-        }
+        },
     },
 
     created() {
@@ -161,8 +232,9 @@ const app = {
         },
 
         stepSlideshow() {
+            toMove = this.phasesDisplayed + 1
             $(".phase").first().animate({
-                right: "+=59px",
+                right: "+=59px", //9.8 * this.phasesDisplayed + "px"
             }, {
                 duration: 500,
                 queue: false,
@@ -173,8 +245,8 @@ const app = {
                 },
                 start: function() {
                     $(".phase").eq(1).addClass("selected")
-                    $(".phase.phase:nth-child(6)").fadeIn(500,"easeInCirc", function() {
-                        $(".phase:nth-child(6)").removeClass("offscreen")
+                    $(".phase.phase:nth-child(" + toMove + ")").fadeIn(500,"easeInCirc", function() {
+                        $(".phase:nth-child(" + toMove + ")").removeClass("offscreen")
                     })
                     $(".phase").first().fadeOut(780,"easeOutExpo", function() {
                         $(".phase").first().addClass("offscreen")
@@ -245,13 +317,46 @@ const app = {
             }
             this.menuSelected = ! this.menuSelected
         },
+
+        notify(msg) {
+            title = "Hey!"
+            if (!window.Notification) {
+                console.log('Browser does not support notifications.');
+            } else {
+                // check if permission is already granted
+                if (Notification.permission === 'granted') {
+                    new Notification(title, {body: msg})
+                } else {
+                    // request permission from user
+                    Notification.requestPermission().then(function(p) {
+                    if (p === 'granted') {
+                        new Notification(title, {body: msg})
+                    } else {
+                        console.log('User blocked notifications.');
+                    }
+                    }).catch(function(err) {
+                        console.error(err);
+                    });
+                }
+            }
+        },
+
+        changeTimerStyle(newStyle) {
+            this.timerStyle = newStyle
+        },
     },
 
     mounted() { // JUST FOR DEVELOPING PURPLES, DELETE LATER
         //this.toggleSettings()
+        //this.notify("ciao")
+        for (var i = 0; i < this.initPhases.length; i++) {
+            var classes = this.initPhases[i]
+            classes += i > this.phasesDisplayes ? " offscreen" : "" 
+            $("#carousel").append('<div class="' + classes + '"></div>')
+        }
     }
 };
 
-Vue.createApp(app).mount("#app")
+var vm = Vue.createApp(app).mount("#app")
 
 </script>
