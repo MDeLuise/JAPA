@@ -1,6 +1,8 @@
 function display(secName) {
     $(".menu-body").css("display", "none")
     $("#menu-sec-" + secName).css("display", "initial")
+    $("button").removeClass("btn-selected")
+    $("#" + secName + "-btn").addClass("btn-selected")
 }
 
 $(document).ready(function() {
