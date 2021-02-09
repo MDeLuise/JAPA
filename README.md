@@ -19,4 +19,4 @@ Project is created with:
 To run this project open ```pomodoro.html``` file in the browser.
 
 ## Screenshots
-<img src="docs/images/screenshot_1.png" width="400">
+<img src="images/screenshot_1.png" width="400">
