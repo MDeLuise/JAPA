@@ -59,3 +59,17 @@
 .menu-body:not(#menu-sec-main) {
     display: none;
 }
+
+
+
+.inline-menu-entry {
+    display: flex;
+}
+
+.inline-menu-lx {
+    margin-right: auto;
+}
+
+.inline-menu-rx {
+    margin-left: auto;
+}
